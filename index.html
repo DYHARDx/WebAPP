@@ -3,371 +3,1152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnimePin - Random Anime Gallery</title>
+    <title>AniVerse - Ultimate Anime Experience</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #ff2d75;
+            --secondary: #00b8ff;
+            --dark: #0a0e17;
+            --light: #f0f5ff;
+            --gray: #8a9bb8;
+            --dark-gray: #121a2b;
+            --neon-glow: 0 0 10px rgba(255, 45, 117, 0.7), 0 0 20px rgba(255, 45, 117, 0.5), 0 0 30px rgba(255, 45, 117, 0.3);
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
-
+        
         body {
-            background-color: #f5f5f5;
-            color: #333;
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+            perspective: 1000px;
         }
-
+        
+        /* Improved Scrollbar (Works on Mobile) */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--dark-gray);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        /* Header with Better Mobile Support */
         header {
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            position: sticky;
+            position: fixed;
             top: 0;
-            z-index: 100;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: rgba(10, 14, 23, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
         }
-
+        
         .logo {
-            font-size: 24px;
+            color: var(--light);
+            font-size: 1.8rem;
             font-weight: bold;
-            color: #e60023;
-        }
-
-        .search-bar {
+            text-decoration: none;
             display: flex;
-            width: 60%;
-            max-width: 600px;
+            align-items: center;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: var(--neon-glow);
         }
-
-        .search-bar input {
-            flex: 1;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 24px;
-            font-size: 16px;
-            outline: none;
+        
+        .logo i {
+            margin-right: 8px;
         }
-
-        .search-bar input:focus {
-            border-color: #e60023;
-        }
-
-        .user-actions {
-            display: flex;
-            gap: 15px;
-        }
-
-        .user-actions button {
+        
+        /* Mobile Menu Button */
+        .menu-toggle {
+            display: none;
             background: none;
             border: none;
+            color: var(--light);
+            font-size: 1.5rem;
             cursor: pointer;
-            font-size: 16px;
+            z-index: 1001;
         }
-
-        .container {
-            padding: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
+        
+        nav {
+            transition: all 0.3s ease;
         }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            grid-gap: 20px;
-            align-items: start;
+        
+        nav ul {
+            display: flex;
+            list-style: none;
         }
-
-        .pin {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+        
+        nav ul li {
+            margin-left: 15px;
             position: relative;
         }
-
-        .pin:hover {
-            transform: scale(1.03);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        
+        nav ul li::before {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
         }
-
-        .pin-image {
+        
+        nav ul li:hover::before {
             width: 100%;
-            height: auto;
-            display: block;
-            min-height: 200px;
-            background-color: #eee;
+        }
+        
+        nav ul li a {
+            color: var(--light);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 8px 15px;
+            margin-left: 15px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: var(--light);
+            padding: 5px;
+            width: 0;
+            outline: none;
+            transition: width 0.3s ease;
+        }
+        
+        .search-box.active input {
+            width: 150px;
+        }
+        
+        .search-box i {
+            color: var(--light);
+            cursor: pointer;
+        }
+        
+        /* Hero Section with Better Image Loading */
+        .hero {
+            height: 100vh;
+            min-height: 600px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(10, 14, 23, 0.9) 0%, rgba(10, 14, 23, 0.5) 50%, rgba(10, 14, 23, 0) 100%);
+            z-index: 2;
+        }
+        
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
+            z-index: 1;
         }
-
-        .pin-info {
-            padding: 12px;
+        
+        .hero-content {
+            position: relative;
+            z-index: 3;
+            max-width: 600px;
         }
-
-        .pin-title {
+        
+        .hero-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            background: linear-gradient(45deg, var(--light), var(--gray));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero-content p {
+            font-size: 1rem;
+            margin-bottom: 25px;
+            color: var(--gray);
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.95rem;
             font-weight: bold;
-            margin-bottom: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            border: none;
         }
-
-        .pin-actions {
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), #ff5e8a);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 45, 117, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(138, 155, 184, 0.2);
+            color: white;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn i {
+            margin-right: 6px;
+        }
+        
+        /* Improved Movie Cards with Click Animation */
+        .section {
+            padding: 0 20px;
+            margin-bottom: 50px;
+            position: relative;
+        }
+        
+        .section-header {
             display: flex;
             justify-content: space-between;
-            margin-top: 10px;
+            align-items: center;
+            margin-bottom: 20px;
         }
-
-        .pin-actions button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #555;
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--light), var(--gray));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-
-        .pin-actions button:hover {
-            color: #e60023;
+        
+        .see-all {
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
         }
-
-        .loading {
-            text-align: center;
-            padding: 30px;
-            color: #777;
+        
+        .see-all:hover {
+            color: var(--primary);
+        }
+        
+        .movie-row {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding-bottom: 15px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+        
+        .movie-row::-webkit-scrollbar {
             display: none;
         }
-
-        .error {
-            color: #e60023;
-            text-align: center;
-            padding: 20px;
+        
+        .movie-card {
+            min-width: 160px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0; /* Prevent cards from shrinking */
         }
-
+        
+        .movie-card img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+        
+        .movie-card .movie-poster {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .movie-card .movie-poster::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: linear-gradient(to top, rgba(10, 14, 23, 0.8) 0%, transparent 100%);
+        }
+        
+        .movie-card .quick-info {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            z-index: 2;
+        }
+        
+        .movie-card .quick-info h3 {
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .movie-card .quick-info .info {
+            display: flex;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .movie-card .quick-info .rating {
+            color: gold;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .movie-card .quick-info .rating i {
+            margin-right: 3px;
+            font-size: 0.7rem;
+        }
+        
+        /* Movie Details Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: var(--dark-gray);
+            margin: 20px auto;
+            max-width: 900px;
+            width: 95%;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: modalFadeIn 0.4s ease-out;
+            position: relative;
+        }
+        
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            background: var(--primary);
+        }
+        
+        .modal-header {
+            position: relative;
+            height: 300px;
+            overflow: hidden;
+        }
+        
+        .modal-header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .modal-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(to top, var(--dark-gray), transparent);
+        }
+        
+        .modal-body {
+            padding: 20px;
+            margin-top: -50px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .modal-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+        
+        .modal-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .modal-rating {
+            display: flex;
+            align-items: center;
+            color: gold;
+            font-weight: bold;
+        }
+        
+        .modal-rating i {
+            margin-right: 5px;
+        }
+        
+        .modal-year, .modal-duration, .modal-genres {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .modal-description {
+            margin: 20px 0;
+            line-height: 1.6;
+            color: var(--light);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        /* Categories with Better Touch Support */
+        .categories {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .categories::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .category {
+            padding: 8px 15px;
+            background-color: var(--dark-gray);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .category.active {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border-color: transparent;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark-gray);
+            padding: 40px 20px 20px;
+            text-align: center;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .social-links a {
+            color: var(--gray);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            color: var(--primary);
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .footer-links a {
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--light);
+        }
+        
+        .copyright {
+            color: var(--gray);
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        /* Responsive Improvements */
         @media (max-width: 768px) {
-            .grid {
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            .menu-toggle {
+                display: block;
             }
             
-            header {
+            nav {
+                position: fixed;
+                top: 0;
+                right: -250px;
+                width: 250px;
+                height: 100vh;
+                background: var(--dark-gray);
+                padding: 70px 20px 20px;
+                box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+                transition: all 0.3s ease;
+            }
+            
+            nav.active {
+                right: 0;
+            }
+            
+            nav ul {
                 flex-direction: column;
-                gap: 15px;
             }
             
-            .search-bar {
+            nav ul li {
+                margin: 15px 0;
+            }
+            
+            .search-box {
+                margin-left: 0;
+                margin-top: 15px;
                 width: 100%;
+            }
+            
+            .search-box.active input {
+                width: 100%;
+            }
+            
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-content p {
+                font-size: 0.95rem;
+            }
+            
+            .btn {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .modal-header {
+                height: 200px;
+            }
+            
+            .modal-title {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .hero {
+                min-height: 500px;
+            }
+            
+            .movie-card {
+                min-width: 140px;
+            }
+            
+            .movie-card img {
+                height: 200px;
+            }
+            
+            .modal-content {
+                width: 100%;
+                margin: 0;
+                border-radius: 0;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">AnimePin</div>
-        <div class="search-bar">
-            <input type="text" placeholder="Search for anime images..." id="searchInput">
-        </div>
-        <div class="user-actions">
-            <button id="refreshBtn">Refresh</button>
-            <button id="themeToggle">🌓</button>
-        </div>
+    <!-- Header -->
+    <header id="header">
+        <a href="#" class="logo">
+            <i class="fas fa-film"></i>
+            AniVerse
+        </a>
+        
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <nav id="nav">
+            <ul>
+                <li><a href="#" class="active">Home</a></li>
+                <li><a href="#">Anime</a></li>
+                <li><a href="#">Movies</a></li>
+                <li><a href="#">TV Shows</a></li>
+                <li><a href="#">My List</a></li>
+            </ul>
+            
+            <div class="search-box" id="searchBox">
+                <input type="text" placeholder="Search anime...">
+                <i class="fas fa-search"></i>
+            </div>
+        </nav>
     </header>
 
-    <div class="container">
-        <div class="grid" id="imageGrid"></div>
-        <div class="loading" id="loadingIndicator">Loading more anime...</div>
-        <div class="error" id="errorDisplay" style="display: none;"></div>
+    <!-- Hero Section -->
+    <section class="hero">
+        <img src="https://image.tmdb.org/t/p/original/7drO1kYgQ0PnnU87sAnBEphYrSM.jpg" alt="Demon Slayer Banner" class="hero-bg" loading="lazy">
+        <div class="hero-content">
+            <h1>Demon Slayer: Mugen Train</h1>
+            <p>After his family was brutally murdered and his sister turned into a demon, Tanjiro Kamado's journey as a demon slayer began. Now, he boards the Infinity Train on a new mission with the Flame Hashira, Kyojuro Rengoku.</p>
+            <div class="hero-buttons">
+                <a href="#" class="btn btn-primary">
+                    <i class="fas fa-play"></i> Watch Now
+                </a>
+                <a href="#" class="btn btn-secondary">
+                    <i class="fas fa-info-circle"></i> More Info
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="section">
+        <div class="categories">
+            <div class="category active">All</div>
+            <div class="category">Action</div>
+            <div class="category">Adventure</div>
+            <div class="category">Fantasy</div>
+            <div class="category">Isekai</div>
+            <div class="category">Romance</div>
+            <div class="category">Comedy</div>
+            <div class="category">Sci-Fi</div>
+            <div class="category">Horror</div>
+        </div>
+    </section>
+
+    <!-- Trending Now -->
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Trending Now</h2>
+            <a href="#" class="see-all">See All <i class="fas fa-chevron-right"></i></a>
+        </div>
+        <div class="movie-row">
+            <!-- Movie 1 -->
+            <div class="movie-card" onclick="openModal('Attack on Titan Final Season', '9.1', '2023', 'Action, Drama, Fantasy', 'The final season of the epic anime series where humanity makes its last stand against the Titans.', 'https://image.tmdb.org/t/p/w500/qjGrUmKW78MCFG8PTLDBp67S27p.jpg')">
+                <div class="movie-poster">
+                    <img src="https://image.tmdb.org/t/p/w500/qjGrUmKW78MCFG8PTLDBp67S27p.jpg" alt="Attack on Titan" loading="lazy">
+                    <div class="quick-info">
+                        <h3>Attack on Titan Final Season</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 9.1</span>
+                            <span>2023</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Movie 2 -->
+            <div class="movie-card" onclick="openModal('Jujutsu Kaisen 0', '8.3', '2021', 'Action, Fantasy, Supernatural', 'Yuta Okkotsu gains control of an extremely powerful cursed spirit and enrolls in the Tokyo Prefectural Jujutsu High School.', 'https://image.tmdb.org/t/p/w500/nTvM4mhqNlHIvUkI1gVnW6xp7hr.jpg')">
+                <div class="movie-poster">
+                    <img src="https://image.tmdb.org/t/p/w500/nTvM4mhqNlHIvUkI1gVnW6xp7hr.jpg" alt="Jujutsu Kaisen" loading="lazy">
+                    <div class="quick-info">
+                        <h3>Jujutsu Kaisen 0</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.3</span>
+                            <span>2021</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Movie 3 -->
+            <div class="movie-card" onclick="openModal('Your Name', '8.7', '2016', 'Romance, Fantasy, Drama', 'Two teenagers share a profound, magical connection upon discovering they are swapping bodies.', 'https://image.tmdb.org/t/p/w500/m9cn5mhW519QKr1YGpGxNWi98VJ.jpg')">
+                <div class="movie-poster">
+                    <img src="https://image.tmdb.org/t/p/w500/m9cn5mhW519QKr1YGpGxNWi98VJ.jpg" alt="Your Name" loading="lazy">
+                    <div class="quick-info">
+                        <h3>Your Name</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.7</span>
+                            <span>2016</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Movie 4 -->
+            <div class="movie-card" onclick="openModal('One Piece Film: Red', '7.4', '2022', 'Action, Adventure, Fantasy', 'Uta — the most beloved singer in the world whose voice has been described as "otherworldly" — is revealed to be the enigmatic Shanks\' daughter.', 'https://image.tmdb.org/t/p/w500/dQNJSA8h9eNiNA9uE7F3Z6PJxyf.jpg')">
+                <div class="movie-poster">
+                    <img src="https://image.tmdb.org/t/p/w500/dQNJSA8h9eNiNA9uE7F3Z6PJxyf.jpg" alt="One Piece Film Red" loading="lazy">
+                    <div class="quick-info">
+                        <h3>One Piece Film: Red</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 7.4</span>
+                            <span>2022</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Movie 5 -->
+            <div class="movie-card" onclick="openModal('Spirited Away', '8.5', '2001', 'Fantasy, Adventure, Family', 'During her family\'s move to the suburbs, a sullen 10-year-old girl wanders into a world ruled by gods, witches, and spirits.', 'https://image.tmdb.org/t/p/w500/5M0j0B18abtBI5gi2RhfjjurTqb.jpg')">
+                <div class="movie-poster">
+                    <img src="https://image.tmdb.org/t/p/w500/5M0j0B18abtBI5gi2RhfjjurTqb.jpg" alt="Spirited Away" loading="lazy">
+                    <div class="quick-info">
+                        <h3>Spirited Away</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.5</span>
+                            <span>2001</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Anime -->
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Popular Anime</h2>
+            <a href="#" class="see-all">See All <i class="fas fa-chevron-right"></i></a>
+        </div>
+        <div class="movie-row">
+            <!-- Movie 1 -->
+            <div class="movie-card" onclick="openModal('Naruto: Shippuden', '8.4', '2007-2017', 'Action, Adventure, Fantasy', 'Naruto Uzumaki wants to be the best ninja in the land. He\'s done well so far, but with the looming danger posed by the mysterious Akatsuki organization.', 'https://image.tmdb.org/t/p/w500/9IXMHG4s0QzFQi3zRC1ScXYIlzK.jpg')">
+                <div class="movie-poster">
+                    <img src="https://image.tmdb.org/t/p/w500/9IXMHG4s0QzFQi3zRC1ScXYIlzK.jpg" alt="Naruto" loading="lazy">
+                    <div class="quick-info">
+                        <h3>Naruto: Shippuden</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.4</span>
+                            <span>2007-2017</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Movie 2 -->
+            <div class="movie-card" onclick="openModal('Death Note', '8.6', '2006-2007', 'Mystery, Psychological, Thriller', 'Light Yagami finds a supernatural notebook that grants him the power to kill anyone by writing their name.', 'https://image.tmdb.org/t/p/w500/6UH52Fmau8RPsMAbQbjwN3wJSCj.jpg')">
+                <div class="movie-poster">
+                    <img src="https://image.tmdb.org/t/p/w500/6UH52Fmau8RPsMAbQbjwN3wJSCj.jpg" alt="Death Note" loading="lazy">
+                    <div class="quick-info">
+                        <h3>Death Note</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.6</span>
+                            <span>2006-2007</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Movie 3 -->
+            <div class="movie-card" onclick="openModal('Dragon Ball Z', '8.2', '1989-1996', 'Action, Adventure, Fantasy', 'With the help of the powerful Dragonballs, a team of fighters led by the saiyan warrior Goku defend the planet Earth from extraterrestrial enemies.', 'https://image.tmdb.org/t/p/w500/7RWcEr60fIcArKGY2SYXS2ivWOk.jpg')">
+                <div class="movie-poster">
+                    <img src="https://image.tmdb.org/t/p/w500/7RWcEr60fIcArKGY2SYXS2ivWOk.jpg" alt="Dragon Ball Z" loading="lazy">
+                    <div class="quick-info">
+                        <h3>Dragon Ball Z</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.2</span>
+                            <span>1989-1996</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Movie 4 -->
+            <div class="movie-card" onclick="openModal('One Punch Man', '8.5', '2015-2019', 'Action, Comedy, Superhero', 'Saitama is a hero who only became a hero for fun. After three years of special training, he became so powerful that he can defeat enemies with a single punch.', 'https://image.tmdb.org/t/p/w500/6AL6S9XlrQeogDYzGJU5QyVKqZN.jpg')">
+                <div class="movie-poster">
+                    <img src="https://image.tmdb.org/t/p/w500/6AL6S9XlrQeogDYzGJU5QyVKqZN.jpg" alt="One Punch Man" loading="lazy">
+                    <div class="quick-info">
+                        <h3>One Punch Man</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 8.5</span>
+                            <span>2015-2019</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Movie 5 -->
+            <div class="movie-card" onclick="openModal('Fullmetal Alchemist: Brotherhood', '9.1', '2009-2010', 'Action, Adventure, Fantasy', 'Two brothers search for a Philosopher\'s Stone after an attempt to revive their deceased mother goes awry and leaves them in damaged physical forms.', 'https://image.tmdb.org/t/p/w500/5M0j0B18abtBI5gi2RhfjjurTqb.jpg')">
+                <div class="movie-poster">
+                    <img src="https://image.tmdb.org/t/p/w500/5M0j0B18abtBI5gi2RhfjjurTqb.jpg" alt="Fullmetal Alchemist" loading="lazy">
+                    <div class="quick-info">
+                        <h3>Fullmetal Alchemist: Brotherhood</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> 9.1</span>
+                            <span>2009-2010</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Coming Soon -->
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Coming Soon</h2>
+            <a href="#" class="see-all">See All <i class="fas fa-chevron-right"></i></a>
+        </div>
+        <div class="movie-row">
+            <!-- Movie 1 -->
+            <div class="movie-card" onclick="openModal('Suzume no Tojimari', '-', '2023', 'Adventure, Fantasy, Romance', 'A modern action adventure road story where a 17-year-old girl named Suzume helps a mysterious young man close doors from the other side that are releasing disasters all over Japan.', 'https://image.tmdb.org/t/p/w500/5M0j0B18abtBI5gi2RhfjjurTqb.jpg')">
+                <div class="movie-poster">
+                    <img src="https://image.tmdb.org/t/p/w500/5M0j0B18abtBI5gi2RhfjjurTqb.jpg" alt="Suzume" loading="lazy">
+                    <div class="quick-info">
+                        <h3>Suzume no Tojimari</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> -</span>
+                            <span>2023</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Movie 2 -->
+            <div class="movie-card" onclick="openModal('Chainsaw Man Movie', '-', '2023', 'Action, Fantasy, Horror', 'Denji has a simple dream—to live a happy and peaceful life, spending time with a girl he likes. But when he is betrayed and killed, he merges with his pet chainsaw devil.', 'https://image.tmdb.org/t/p/w500/5M0j0B18abtBI5gi2RhfjjurTqb.jpg')">
+                <div class="movie-poster">
+                    <img src="https://image.tmdb.org/t/p/w500/5M0j0B18abtBI5gi2RhfjjurTqb.jpg" alt="Chainsaw Man" loading="lazy">
+                    <div class="quick-info">
+                        <h3>Chainsaw Man Movie</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> -</span>
+                            <span>2023</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Movie 3 -->
+            <div class="movie-card" onclick="openModal('Vinland Saga Season 2', '-', '2023', 'Action, Adventure, Drama', 'The second season of Vinland Saga continues Thorfinn\'s journey of self-discovery and redemption.', 'https://image.tmdb.org/t/p/w500/5M0j0B18abtBI5gi2RhfjjurTqb.jpg')">
+                <div class="movie-poster">
+                    <img src="https://image.tmdb.org/t/p/w500/5M0j0B18abtBI5gi2RhfjjurTqb.jpg" alt="Vinland Saga" loading="lazy">
+                    <div class="quick-info">
+                        <h3>Vinland Saga Season 2</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> -</span>
+                            <span>2023</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Movie 4 -->
+            <div class="movie-card" onclick="openModal('Demon Slayer Season 3', '-', '2023', 'Action, Fantasy, Adventure', 'The third season of Demon Slayer follows Tanjiro and his friends as they continue their mission to defeat demons and find a cure for Nezuko.', 'https://image.tmdb.org/t/p/w500/5M0j0B18abtBI5gi2RhfjjurTqb.jpg')">
+                <div class="movie-poster">
+                    <img src="https://image.tmdb.org/t/p/w500/5M0j0B18abtBI5gi2RhfjjurTqb.jpg" alt="Demon Slayer" loading="lazy">
+                    <div class="quick-info">
+                        <h3>Demon Slayer Season 3</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> -</span>
+                            <span>2023</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Movie 5 -->
+            <div class="movie-card" onclick="openModal('Spy x Family Movie', '-', '2023', 'Action, Comedy, Family', 'A spy, an assassin, and a telepath form a fake family to maintain their cover stories, leading to hilarious and heartwarming situations.', 'https://image.tmdb.org/t/p/w500/5M0j0B18abtBI5gi2RhfjjurTqb.jpg')">
+                <div class="movie-poster">
+                    <img src="https://image.tmdb.org/t/p/w500/5M0j0B18abtBI5gi2RhfjjurTqb.jpg" alt="Spy x Family" loading="lazy">
+                    <div class="quick-info">
+                        <h3>Spy x Family Movie</h3>
+                        <div class="info">
+                            <span class="rating"><i class="fas fa-star"></i> -</span>
+                            <span>2023</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+            <a href="#"><i class="fab fa-discord"></i></a>
+        </div>
+        <div class="footer-links">
+            <a href="#">Home</a>
+            <a href="#">Anime</a>
+            <a href="#">Movies</a>
+            <a href="#">TV Shows</a>
+            <a href="#">My List</a>
+            <a href="#">Account</a>
+            <a href="#">Help Center</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy</a>
+            <a href="#">Cookie Preferences</a>
+        </div>
+        <p class="copyright">© 2023 AniVerse. All rights reserved. All anime and manga are trademarks of their respective owners.</p>
+    </footer>
+
+    <!-- Movie Details Modal -->
+    <div class="modal" id="movieModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <img id="modalPoster" src="" alt="Movie Poster">
+            </div>
+            <div class="modal-body">
+                <h2 class="modal-title" id="modalTitle">Movie Title</h2>
+                <div class="modal-meta">
+                    <div class="modal-rating" id="modalRating"><i class="fas fa-star"></i> 8.5</div>
+                    <div class="modal-year" id="modalYear">2023</div>
+                    <div class="modal-genres" id="modalGenres">Action, Adventure</div>
+                </div>
+                <p class="modal-description" id="modalDescription">Movie description goes here.</p>
+                <div class="modal-buttons">
+                    <a href="#" class="btn btn-primary">
+                        <i class="fas fa-play"></i> Watch Now
+                    </a>
+                    <a href="#" class="btn btn-secondary">
+                        <i class="fas fa-plus"></i> Add to List
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Available anime image APIs
-        const APIs = [
-            {
-                name: 'Waifu.im',
-                url: 'https://api.waifu.im/search',
-                params: {
-                    included_tags: ['waifu'],
-                    height: '>=2000'
-                },
-                getImageUrl: (data) => data.images[0].url
-            },
-            {
-                name: 'nekos.best',
-                url: 'https://nekos.best/api/v2/neko',
-                getImageUrl: (data) => data.results[0].url
-            },
-            {
-                name: 'AnimeAPI',
-                url: 'https://api.jikan.moe/v4/random/anime',
-                getImageUrl: (data) => data.data.images.jpg.large_image_url
-            }
-        ];
-
-        // DOM elements
-        const imageGrid = document.getElementById('imageGrid');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const errorDisplay = document.getElementById('errorDisplay');
-        const refreshBtn = document.getElementById('refreshBtn');
-        const themeToggle = document.getElementById('themeToggle');
-        const searchInput = document.getElementById('searchInput');
-
-        // Theme management
-        themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-theme');
-            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const nav = document.getElementById('nav');
+        
+        menuToggle.addEventListener('click', function() {
+            nav.classList.toggle('active');
+            menuToggle.innerHTML = nav.classList.contains('active') ? 
+                '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
         });
-
-        // Check for saved theme preference
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-theme');
-        }
-
-        // Function to show error
-        function showError(message) {
-            errorDisplay.textContent = message;
-            errorDisplay.style.display = 'block';
-            setTimeout(() => {
-                errorDisplay.style.display = 'none';
-            }, 5000);
-        }
-
-        // Function to fetch random anime image
-        async function fetchRandomAnimeImage() {
-            const randomAPI = APIs[Math.floor(Math.random() * APIs.length)];
+        
+        // Search Box Toggle
+        const searchBox = document.getElementById('searchBox');
+        searchBox.addEventListener('click', function() {
+            this.classList.toggle('active');
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!nav.contains(e.target) && e.target !== menuToggle) {
+                nav.classList.remove('active');
+                menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        });
+        
+        // Modal Functions
+        function openModal(title, rating, year, genres, description, poster) {
+            const modal = document.getElementById('movieModal');
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalRating').innerHTML = `<i class="fas fa-star"></i> ${rating}`;
+            document.getElementById('modalYear').textContent = year;
+            document.getElementById('modalGenres').textContent = genres;
+            document.getElementById('modalDescription').textContent = description;
+            document.getElementById('modalPoster').src = poster;
+            document.getElementById('modalPoster').alt = title;
             
-            try {
-                let apiUrl = randomAPI.url;
-                
-                // Build URL with params if they exist
-                if (randomAPI.params) {
-                    const params = new URLSearchParams();
-                    for (const key in randomAPI.params) {
-                        if (Array.isArray(randomAPI.params[key])) {
-                            randomAPI.params[key].forEach(value => params.append(key, value));
-                        } else {
-                            params.append(key, randomAPI.params[key]);
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeModal() {
+            document.getElementById('movieModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target === document.getElementById('movieModal')) {
+                closeModal();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        // Improved image loading with lazy loading
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = document.querySelectorAll('img[loading="lazy"]');
+            
+            if ('IntersectionObserver' in window) {
+                const imageObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const image = entry.target;
+                            image.src = image.dataset.src || image.src;
+                            imageObserver.unobserve(image);
                         }
-                    }
-                    apiUrl += `?${params.toString()}`;
-                }
-                
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error(`API error: ${response.status}`);
-                
-                const data = await response.json();
-                return {
-                    url: randomAPI.getImageUrl(data),
-                    source: randomAPI.name,
-                    title: `From ${randomAPI.name}`
-                };
-            } catch (error) {
-                console.error(`Error fetching from ${randomAPI.name}:`, error);
-                throw error;
-            }
-        }
-
-        // Function to create a pin element
-        function createPin(image) {
-            const pin = document.createElement('div');
-            pin.className = 'pin';
-            
-            pin.innerHTML = `
-                <img src="${image.url}" alt="${image.title}" class="pin-image" loading="lazy">
-                <div class="pin-info">
-                    <div class="pin-title">${image.title}</div>
-                    <div class="pin-actions">
-                        <button class="like-btn">❤️ ${Math.floor(Math.random() * 5000)}</button>
-                        <button class="save-btn">Save</button>
-                    </div>
-                </div>
-            `;
-            
-            // Add error handling for images
-            pin.querySelector('img').onerror = () => {
-                pin.querySelector('.pin-image').style.backgroundColor = '#ffebee';
-                pin.querySelector('.pin-title').textContent = 'Image failed to load';
-            };
-            
-            return pin;
-        }
-
-        // Function to load more pins
-        async function loadMorePins(count = 6) {
-            loadingIndicator.style.display = 'block';
-            errorDisplay.style.display = 'none';
-            
-            try {
-                const promises = [];
-                for (let i = 0; i < count; i++) {
-                    promises.push(fetchRandomAnimeImage());
-                }
-                
-                const images = await Promise.all(promises);
-                images.forEach(image => {
-                    if (image.url) {
-                        imageGrid.appendChild(createPin(image));
-                    }
-                });
-            } catch (error) {
-                showError("Failed to load some images. Trying again...");
-                console.error("Error loading images:", error);
-                
-                // Fallback to placeholder if all APIs fail
-                if (imageGrid.children.length === 0) {
-                    const placeholderPin = createPin({
-                        url: 'https://via.placeholder.com/600x900/ffebee/cc0000?text=API+Error',
-                        title: 'Failed to load images',
-                        source: 'Placeholder'
                     });
-                    imageGrid.appendChild(placeholderPin);
-                }
-            } finally {
-                loadingIndicator.style.display = 'none';
-            }
-        }
-
-        // Refresh all images
-        refreshBtn.addEventListener('click', () => {
-            imageGrid.innerHTML = '';
-            loadMorePins();
-        });
-
-        // Infinite scroll
-        let isLoading = false;
-        window.addEventListener('scroll', () => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && !isLoading) {
-                isLoading = true;
-                loadMorePins(3).then(() => {
-                    isLoading = false;
+                });
+                
+                images.forEach(image => {
+                    imageObserver.observe(image);
                 });
             }
         });
-
-        // Initial load
-        document.addEventListener('DOMContentLoaded', () => {
-            loadMorePins();
-        });
-
-        // Add dark theme styles
-        const style = document.createElement('style');
-        style.textContent = `
-            .dark-theme {
-                background-color: #1a1a1a;
-                color: #f0f0f0;
-            }
-            .dark-theme header {
-                background-color: #2d2d2d;
-            }
-            .dark-theme .pin {
-                background-color: #2d2d2d;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-            }
-            .dark-theme .search-bar input {
-                background-color: #3d3d3d;
-                color: #f0f0f0;
-                border-color: #555;
-            }
-            .dark-theme .pin-actions button {
-                color: #aaa;
-            }
-        `;
-        document.head.appendChild(style);
+        
+        // Smooth scrolling for categories on mobile
+        const categories = document.querySelector('.categories');
+        if (categories) {
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+            
+            categories.addEventListener('mousedown', (e) => {
+                isDown = true;
+                startX = e.pageX - categories.offsetLeft;
+                scrollLeft = categories.scrollLeft;
+            });
+            
+            categories.addEventListener('mouseleave', () => {
+                isDown = false;
+            });
+            
+            categories.addEventListener('mouseup', () => {
+                isDown = false;
+            });
+            
+            categories.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - categories.offsetLeft;
+                const walk = (x - startX) * 2;
+                categories.scrollLeft = scrollLeft - walk;
+            });
+            
+            // Touch support for mobile
+            categories.addEventListener('touchstart', (e) => {
+                isDown = true;
+                startX = e.touches[0].pageX - categories.offsetLeft;
+                scrollLeft = categories.scrollLeft;
+            });
+            
+            categories.addEventListener('touchend', () => {
+                isDown = false;
+            });
+            
+            categories.addEventListener('touchmove', (e) => {
+                if (!isDown) return;
+                const x = e.touches[0].pageX - categories.offsetLeft;
+                const walk = (x - startX) * 2;
+                categories.scrollLeft = scrollLeft - walk;
+            });
+        }
     </script>
 </body>
 </html>
