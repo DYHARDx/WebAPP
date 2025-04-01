@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnimePin - Pinterest-style Anime Gallery</title>
+    <title>AnimePin - Random Anime Gallery</title>
     <style>
         * {
             margin: 0;
@@ -95,7 +95,11 @@
 
         .pin-image {
             width: 100%;
+            height: auto;
             display: block;
+            min-height: 200px;
+            background-color: #eee;
+            object-fit: cover;
         }
 
         .pin-info {
@@ -128,6 +132,13 @@
             text-align: center;
             padding: 30px;
             color: #777;
+            display: none;
+        }
+
+        .error {
+            color: #e60023;
+            text-align: center;
+            padding: 20px;
         }
 
         @media (max-width: 768px) {
@@ -150,29 +161,106 @@
     <header>
         <div class="logo">AnimePin</div>
         <div class="search-bar">
-            <input type="text" placeholder="Search for anime images...">
+            <input type="text" placeholder="Search for anime images..." id="searchInput">
         </div>
         <div class="user-actions">
-            <button>Home</button>
-            <button>Profile</button>
+            <button id="refreshBtn">Refresh</button>
+            <button id="themeToggle">🌓</button>
         </div>
     </header>
 
     <div class="container">
-        <div class="grid" id="imageGrid">
-            <!-- Pins will be added here by JavaScript -->
-        </div>
+        <div class="grid" id="imageGrid"></div>
         <div class="loading" id="loadingIndicator">Loading more anime...</div>
+        <div class="error" id="errorDisplay" style="display: none;"></div>
     </div>
 
     <script>
-        // Sample anime image data (in a real app, you'd fetch from an API)
-        const animeImages = [
-            { id: 1, url: "https://example.com/anime1.jpg", title: "Beautiful Anime Girl", likes: 1243 },
-            { id: 2, url: "https://example.com/anime2.jpg", title: "Cool Anime Boy", likes: 876 },
-            { id: 3, url: "https://example.com/anime3.jpg", title: "Fantasy Landscape", likes: 1532 },
-            // Add more images as needed
+        // Available anime image APIs
+        const APIs = [
+            {
+                name: 'Waifu.im',
+                url: 'https://api.waifu.im/search',
+                params: {
+                    included_tags: ['waifu'],
+                    height: '>=2000'
+                },
+                getImageUrl: (data) => data.images[0].url
+            },
+            {
+                name: 'nekos.best',
+                url: 'https://nekos.best/api/v2/neko',
+                getImageUrl: (data) => data.results[0].url
+            },
+            {
+                name: 'AnimeAPI',
+                url: 'https://api.jikan.moe/v4/random/anime',
+                getImageUrl: (data) => data.data.images.jpg.large_image_url
+            }
         ];
+
+        // DOM elements
+        const imageGrid = document.getElementById('imageGrid');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const errorDisplay = document.getElementById('errorDisplay');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        const searchInput = document.getElementById('searchInput');
+
+        // Theme management
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+        });
+
+        // Check for saved theme preference
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+
+        // Function to show error
+        function showError(message) {
+            errorDisplay.textContent = message;
+            errorDisplay.style.display = 'block';
+            setTimeout(() => {
+                errorDisplay.style.display = 'none';
+            }, 5000);
+        }
+
+        // Function to fetch random anime image
+        async function fetchRandomAnimeImage() {
+            const randomAPI = APIs[Math.floor(Math.random() * APIs.length)];
+            
+            try {
+                let apiUrl = randomAPI.url;
+                
+                // Build URL with params if they exist
+                if (randomAPI.params) {
+                    const params = new URLSearchParams();
+                    for (const key in randomAPI.params) {
+                        if (Array.isArray(randomAPI.params[key])) {
+                            randomAPI.params[key].forEach(value => params.append(key, value));
+                        } else {
+                            params.append(key, randomAPI.params[key]);
+                        }
+                    }
+                    apiUrl += `?${params.toString()}`;
+                }
+                
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error(`API error: ${response.status}`);
+                
+                const data = await response.json();
+                return {
+                    url: randomAPI.getImageUrl(data),
+                    source: randomAPI.name,
+                    title: `From ${randomAPI.name}`
+                };
+            } catch (error) {
+                console.error(`Error fetching from ${randomAPI.name}:`, error);
+                throw error;
+            }
+        }
 
         // Function to create a pin element
         function createPin(image) {
@@ -180,66 +268,106 @@
             pin.className = 'pin';
             
             pin.innerHTML = `
-                <img src="${image.url}" alt="${image.title}" class="pin-image">
+                <img src="${image.url}" alt="${image.title}" class="pin-image" loading="lazy">
                 <div class="pin-info">
                     <div class="pin-title">${image.title}</div>
                     <div class="pin-actions">
-                        <button class="like-btn">❤️ ${image.likes}</button>
+                        <button class="like-btn">❤️ ${Math.floor(Math.random() * 5000)}</button>
                         <button class="save-btn">Save</button>
                     </div>
                 </div>
             `;
             
+            // Add error handling for images
+            pin.querySelector('img').onerror = () => {
+                pin.querySelector('.pin-image').style.backgroundColor = '#ffebee';
+                pin.querySelector('.pin-title').textContent = 'Image failed to load';
+            };
+            
             return pin;
         }
 
         // Function to load more pins
-        function loadMorePins() {
-            const grid = document.getElementById('imageGrid');
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            
+        async function loadMorePins(count = 6) {
             loadingIndicator.style.display = 'block';
+            errorDisplay.style.display = 'none';
             
-            // Simulate API call with timeout
-            setTimeout(() => {
-                // In a real app, you would fetch from an API here
-                for (let i = 0; i < 10; i++) {
-                    // Use random placeholder images from a placeholder service
-                    const randomWidth = Math.floor(Math.random() * 200) + 400;
-                    const randomHeight = Math.floor(Math.random() * 300) + 600;
-                    const placeholderUrl = `https://placekitten.com/${randomWidth}/${randomHeight}`;
-                    
-                    const randomImage = {
-                        url: placeholderUrl,
-                        title: `Anime Art ${Math.floor(Math.random() * 1000)}`,
-                        likes: Math.floor(Math.random() * 5000)
-                    };
-                    
-                    grid.appendChild(createPin(randomImage));
+            try {
+                const promises = [];
+                for (let i = 0; i < count; i++) {
+                    promises.push(fetchRandomAnimeImage());
                 }
                 
+                const images = await Promise.all(promises);
+                images.forEach(image => {
+                    if (image.url) {
+                        imageGrid.appendChild(createPin(image));
+                    }
+                });
+            } catch (error) {
+                showError("Failed to load some images. Trying again...");
+                console.error("Error loading images:", error);
+                
+                // Fallback to placeholder if all APIs fail
+                if (imageGrid.children.length === 0) {
+                    const placeholderPin = createPin({
+                        url: 'https://via.placeholder.com/600x900/ffebee/cc0000?text=API+Error',
+                        title: 'Failed to load images',
+                        source: 'Placeholder'
+                    });
+                    imageGrid.appendChild(placeholderPin);
+                }
+            } finally {
                 loadingIndicator.style.display = 'none';
-            }, 1000);
+            }
         }
+
+        // Refresh all images
+        refreshBtn.addEventListener('click', () => {
+            imageGrid.innerHTML = '';
+            loadMorePins();
+        });
+
+        // Infinite scroll
+        let isLoading = false;
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && !isLoading) {
+                isLoading = true;
+                loadMorePins(3).then(() => {
+                    isLoading = false;
+                });
+            }
+        });
 
         // Initial load
         document.addEventListener('DOMContentLoaded', () => {
             loadMorePins();
-            
-            // Infinite scroll
-            window.addEventListener('scroll', () => {
-                if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
-                    loadMorePins();
-                }
-            });
         });
 
-        // Note: In a production app, you would:
-        // 1. Use a real anime image API (like Waifu.im, AniList, etc.)
-        // 2. Implement proper error handling
-        // 3. Add loading states
-        // 4. Add proper routing if needed
-        // 5. Implement the search functionality
+        // Add dark theme styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .dark-theme {
+                background-color: #1a1a1a;
+                color: #f0f0f0;
+            }
+            .dark-theme header {
+                background-color: #2d2d2d;
+            }
+            .dark-theme .pin {
+                background-color: #2d2d2d;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            }
+            .dark-theme .search-bar input {
+                background-color: #3d3d3d;
+                color: #f0f0f0;
+                border-color: #555;
+            }
+            .dark-theme .pin-actions button {
+                color: #aaa;
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
